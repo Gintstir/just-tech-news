@@ -62,6 +62,46 @@ router.post('/', (req, res) => {
         });
 });
 
+
+//we query the user table using the findOne() method for the email entered by the user and assigned it to req.body.email
+//if the user's email was not found a message is sent back.  If it is found the next step will be to verify the user's identity by
+//matching the pw from the user and hashed pw in the database. this will be done in the promise of the query.  
+
+/* Using the keyword this, we can access this user's properties, including the password, which was stored as a hashed string.
+Now that we have the instance method in place, let's return to look at the code in the /login route in user-routes.js.
+The .findOne() Sequelize method looks for a user with the specified email. The result of the query is passed as dbUserData
+to the .then() part of the .findOne() method. If the query result is successful (i.e., not empty), we can call .checkPassword(),
+which will be on the dbUserData object. We'll need to pass the plaintext password, which is stored in req.body.password,
+into .checkPassword() as the argument. The .compareSync() method, which is inside the .checkPassword() method, can then confirm
+or deny that the supplied password matches the hashed password stored on the object. .checkPassword() will then return true on success
+or false on failure. We'll store that boolean value to the variable validPassword. */
+
+router.post('/login', (req, res) => {
+    //expects {email: 'user@email.com, password: 'password12345'}
+    User.findOne({
+
+        where: {
+            email: req.body.email
+        }
+    }).then(dbUserData => {
+        if(!dbUserData) {
+            res.status(400).json({ message: "No such user with that email address!" });
+            return;
+        }
+
+        //res.json({ user: dbUserData })
+
+        //verify user
+        const validPassword = dbUserData.checkPassword(req.body.password);
+        if(!validPassword) {
+            res.status(400).json({ message: 'Incorrect password!' });
+            return;
+        }
+        res.json({ user: dbUserData, message: 'You are now logged in!' });
+
+    });
+});
+
 //PUT /api/users/1
 //This .update() method combines the parameters for creating data and looking up data. We pass in req.body
 //to provide the new data we want to use in the update and req.params.id to indicate where exactly we want that new data to be used.
