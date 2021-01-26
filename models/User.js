@@ -1,8 +1,10 @@
 const { Model, Datatypes, DataTypes } = require('sequelize');
 const sequelize = require('../config/connection');
+const bcrypt = require('bcrypt');
+
 
 //create user model
-class User extends Model {}
+class User extends Model { }
 
 //define table columns and configuration
 User.init(
@@ -46,6 +48,24 @@ User.init(
         }
     },
     {
+        //use beforeCreate() hook to execute bcrypt hash function on the plaintext password.  In the bcrypt hash function
+        //we pass in the userData object that contains the plaintext password in the password property.  Was pass in a saltRound property of 10.
+        //the hashed pw is then passed to the Promise object as a newUserData object with a hashed pw property.  The return statement then exits
+        //out of the function, returning the hashed pw in the newUserData function.  
+
+        //asyn/await works in tandem to make this async function look more like a regular synchronous function expression.
+
+        hooks: {
+            //set up beforeCreate lifecycle "hook" functionality
+            async beforeCreate(newUserData) {
+                newUserData.password = await bcrypt.hash(newUserData.password, 10);
+                return newUserData;
+            },
+            async beforeUpdate(updatedUserData) {
+                updatedUserData.password = await bcrypt.hash(updatedUserData.password, 10);
+                return updatedUserData;
+            }
+        },
         //TABLE CONFIGURATION OPTIONS GO HERE ((https://sequelize.org/v5/manual/models-definition.html#configuration))
 
         //pass in our  imported sequelize conneciton (the direct connection to our database)
