@@ -3,6 +3,7 @@
 const Post = require('./Post');
 const User = require('./User');
 const Vote = require('./Vote');
+const Comment = require('./Comment');
 
 //create associations - a user can have many posts but a post can only have one user making this a One-to-many relationship.
 //Thanks to Sequelize, we can now use JavaScript to explicitly create this relation. This association creates the reference
@@ -51,4 +52,21 @@ Post.hasMany(Vote, {
     foreignKey: 'post_id'
 });
 
-module.exports = { User, Post, Vote };
+
+Comment.belongsTo(User, {
+    foreignKey: 'user_id'
+});
+
+Comment.belongsTo(Post, {
+    foreignKey: 'post_id'
+});
+
+User.hasMany(Comment, {
+    foreignKey: 'user_id'
+});
+
+Post.hasMany(Comment, {
+    foreignKey: 'post_id'
+});
+
+module.exports = { User, Post, Vote, Comment };
