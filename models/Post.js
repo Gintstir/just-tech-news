@@ -2,8 +2,32 @@ const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/connection');
 
 //create our post model
-
-class Post extends Model {}
+//using JavaScripts built in static keyword to indicat that the upvote method is one thats based on the post model
+//and not an instance method like we used earlier with the user model.
+class Post extends Model {
+    static upvote(body, models){
+        return models.Vote.create({
+            user_id: body.user_id,
+            post_id: body.post_id
+        }).then(() => {
+            return Post.findOne({
+                where: {
+                    id: body.post_id
+                },
+                attributes: [
+                    'id',
+                    'post_url',
+                    'title',
+                    'created_at',
+                    [
+                        sequelize.literal('(SELECT COUNT(*) FROM vote WHERE post.id = vote.post_id)'),
+                        'vote_count'
+                    ]
+                ]
+            });
+        });
+    }
+}
 
 
 //in the first parameter we definet he post schema.  id column is set to primary key and auto
