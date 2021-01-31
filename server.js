@@ -1,13 +1,30 @@
 const express = require('express');
-const routes = require('./routes');
+const routes = require('./controllers/');
 const sequelize = require('./config/connection');
+//this allows access to the css file we added
+const path = require('path');
+//this sets up Handlebars.js functionality
+const exphbs = require('express-handlebars');
+const hbs = exphbs.create({});
+
+
+
+//=====================================
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+//=====================================
+
+app.engine('handlebars', hbs.engine);
+app.set('view engine', 'handlebars');
+
 //middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+//this is an express.js middleware function that can take all of the contents of a folder and serve them as
+//static assets. This is useful for front end specific files like images, style sheets, and javascript files.
+app.use(express.static(path.join(__dirname, 'public')));
 
 //turn on routes
 app.use(routes);
