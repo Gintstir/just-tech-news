@@ -2,9 +2,6 @@ const path = require('path');
 const express = require('express');
 //sets up express-session and sequelize-store
 const session = require('express-session');
-//importing helper functions
-const helpers = require('./utils/helpers');
-
 //this sets up Handlebars.js functionality
 const exphbs = require('express-handlebars');
 
@@ -14,7 +11,6 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 //=====================================
-
 
 const sequelize = require('./config/connection');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
@@ -32,6 +28,8 @@ const sess = {
 //turn on session storage
 app.use(session(sess));
 
+//importing helper functions
+const helpers = require('./utils/helpers');
 
 const hbs = exphbs.create({ helpers });
 
