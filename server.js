@@ -2,6 +2,9 @@ const path = require('path');
 const express = require('express');
 //sets up express-session and sequelize-store
 const session = require('express-session');
+//importing helper functions
+const helpers = require('./utils/helpers');
+
 //this sets up Handlebars.js functionality
 const exphbs = require('express-handlebars');
 
@@ -30,7 +33,7 @@ const sess = {
 app.use(session(sess));
 
 
-const hbs = exphbs.create({});
+const hbs = exphbs.create({ helpers });
 
 
 
