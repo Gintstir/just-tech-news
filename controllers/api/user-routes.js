@@ -1,5 +1,5 @@
 const router = require("express").Router();
-
+const withAuth = require('../../utils/auth');
 const { User, Post, Vote, Comment } = require("../../models");
 
 //GET /api/users
@@ -68,7 +68,7 @@ router.get("/:id", (req, res) => {
 
 //POST /api/users
 // the sequelize .create() method is used here instead of INSERT INTO users (username, email, password) VALUES ('exampleUserName', 'example@email.com', 'password12345')
-router.post("/", (req, res) => {
+router.post("/", withAuth, (req, res) => {
   //expect {username: 'exampleUserName', email: 'example@email.com', password: 'password12345'}
   User.create({
     username: req.body.username,
@@ -102,7 +102,7 @@ into .checkPassword() as the argument. The .compareSync() method, which is insid
 or deny that the supplied password matches the hashed password stored on the object. .checkPassword() will then return true on success
 or false on failure. We'll store that boolean value to the variable validPassword. */
 
-router.post("/login", (req, res) => {
+router.post("/login", withAuth, (req, res) => {
   // expects {email: 'lernantino@gmail.com', password: 'password1234'}
   User.findOne({
     where: {
@@ -132,7 +132,7 @@ router.post("/login", (req, res) => {
 });
 
 
-router.post('/logout', (req, res) => {
+router.post('/logout', withAuth, (req, res) => {
     if (req.session.loggedIn) {
         req.session.destroy(() => {
             res.status(204).end();
@@ -148,7 +148,7 @@ router.post('/logout', (req, res) => {
 // UPDATE users
 // SET username = "Lernantino", email = "lernantino@gmail.com", password = "newPassword1234"
 // WHERE id = 1;
-router.put("/:id", (req, res) => {
+router.put("/:id", withAuth, (req, res) => {
   //expects {username: 'exampleUserName', email: 'example@email.com', password: 'password12345'}
 
   //if req.body has exact key/value pairs to match the model, you can just use req.body instead
@@ -174,7 +174,7 @@ router.put("/:id", (req, res) => {
 //DELETE /api/users/1
 //To delete data, use the .destroy() method
 //and provide some type of identifier to indicate where exactly we would like to delete data from the user database table.
-router.delete("/:id", (req, res) => {
+router.delete("/:id", withAuth, (req, res) => {
   User.destroy({
     where: {
       id: req.params.id,
